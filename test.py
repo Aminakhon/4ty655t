@@ -16,11 +16,27 @@ def create_user_request(name, login, email, password, description, country, phon
               'image': image
     }
     )
+
+def login_request(login, password):
+    return requests.post(
+        API_URL + 'sign_in',
+        json={'login': login,
+              'password':password
+    }
+    )
 def delete_user(name):
     return requests.delete(API_URL + 'delete/' + str(name))
 
 def get_country_request(alpha2):
     return requests.get(API_URL + 'country/' + str(alpha2))
+
+def meprofile_request(token):
+    return requests.get(
+                        API_URL + 'me/profile',
+                        headers={"Authorization": f"Bearer {token}"}
+    )
+
+
 
 def registration():
     return requests.get(API_URL + 'registration')
@@ -48,8 +64,11 @@ def run_artists_api_tests():
     artist_response = get_country_request(user_country)
     assert artist_response.status_code == 200
     print("Get country by alpha2 tests passed!")
-
-
+    user_login = login_request('login', 'password')
+    print(user_login.json())
+    assert user_login.status_code == 200
+    print('Test login passed')
+    token = user_login.json()['token']
 
 
     # проверяем, что можно получить список артистов
